@@ -27,6 +27,7 @@
     
     <script>
 	var ttsspeed = 1;
+	var channel = new URLSearchParams(document.location.search).get("channel") || "thebrutzler"
 	// JavaScript-Code, um die Geschwindigkeit anzupassen
 	const speedSlider = document.getElementById('speedSlider');
 	const speedValue = document.getElementById('speedValue');
@@ -73,7 +74,8 @@
 	ws.onopen = function() {
 		// Once the connection is open, join the channel
 		ws.send('NICK justinfan12345'); // Use a default anonymous username
-		ws.send('JOIN #thebrutzler'); // Joining the channel you want to connect to
+		console.log("joining channel", channel)
+		ws.send("JOIN #" + channel); // Joining the channel you want to connect to
 	};
 
 	ws.onmessage = function(event) {

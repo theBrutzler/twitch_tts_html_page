@@ -120,12 +120,12 @@
 		// Check if message starts with a ':'
 		if (message.startsWith(':')) {
 			// Split the message by spaces
-			const parts = message.split(' ');
+			const parts = message.split('!');
 
 			// Get the second part, which should be the username
 			if (parts.length >= 2) {
 				// Remove ':' from the username
-				return parts[2].substring(1);
+				return parts[0].substring(1);
 			}
 		}
 		return null; // Return null if username extraction fails

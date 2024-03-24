@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Twitch IRC Chat with TTS</title>
+	    <style>
+        /* Stil für den Schieberegler */
+		var windowWidth = window.innerWidth; // Get window width
+        #speedSlider {
+			slider.style.width = windowWidth + 'px'; // Set slider width to window width
+            width: 200px;
+        }
+        /* Stil für den Schieberegler */
+        #volumeSlider {
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Twitch IRC Chat with TTS</h1>
+	<!-- Schieberegler für die Geschwindigkeit -->
+    <input type="range" min="0.5" max="2" step="0.1" value="1" id="speedSlider">
+    <span id="speedValue">Speed: 1</span>
+    <input type="range" min="0.1" max="1" step="0.1" value="1" id="volumeSlider">
+    <span id="volumeValue">Volume: 1</span>
+	
+    <div id="chat"></div>
+    
+    <script>
+	var ttsspeed = 1;
+	// JavaScript-Code, um die Geschwindigkeit anzupassen
+	const speedSlider = document.getElementById('speedSlider');
+	const speedValue = document.getElementById('speedValue');
+
+	// Event-Listener für Änderungen am Schieberegler
+	speedSlider.addEventListener('input', function() {
+		// Aktualisiere den Wert des Schiebereglers
+		const speed = parseFloat(speedSlider.value).toFixed(1);
+		speedValue.textContent = 'Speed: ' + speed;
+		// Fügen Sie Ihre Logik hinzu, um die TTS-Geschwindigkeit entsprechend anzupassen
+		adjustTTS(speed);
+	});
+	
+	function adjustTTS(speed) {
+		// Implementieren Sie hier Ihre Logik, um die TTS-Geschwindigkeit anzupassen
+		// Verwenden Sie die Variable 'speed', um die Geschwindigkeit anzupassen
+		ttsspeed = speed;
+		console.log('TTS speed adjusted to:', speed);
+	}
+	
+	var ttsvolume = 1;
+	// JavaScript-Code, um die Geschwindigkeit anzupassen
+	const volumeSlider = document.getElementById('volumeSlider');
+	const volumeValue = document.getElementById('volumeValue');
+
+	// Event-Listener für Änderungen am Schieberegler
+	volumeSlider.addEventListener('input', function() {
+		// Aktualisiere den Wert des Schiebereglers
+		const volume = parseFloat(volumeSlider.value).toFixed(1);
+		volumeValue.textContent = 'volume: ' + volume;
+		// Fügen Sie Ihre Logik hinzu, um die TTS-Geschwindigkeit entsprechend anzupassen
+		adjustTTSV(volume);
+	});
+	
+	function adjustTTSV(volume) {
+		// Implementieren Sie hier Ihre Logik, um die TTS-Geschwindigkeit anzupassen
+		// Verwenden Sie die Variable 'volume', um die Geschwindigkeit anzupassen
+		ttsvolume = volume;
+		console.log('TTS volume adjusted to:', volume);
+	}
+	
+	const ws = new WebSocket('wss://irc-ws.chat.twitch.tv:443');
+	
+	ws.onopen = function() {
+		// Once the connection is open, join the channel
+		ws.send('NICK justinfan12345'); // Use a default anonymous username
+		ws.send('JOIN #thebrutzler'); // Joining the channel you want to connect to
+	};
+
+	ws.onmessage = function(event) {
+		const message = event.data;
+		console.log(message); // Log received message
+		
+		// Defragment message and extract text after !tts command
+		const ttsIndex = message.indexOf('!tts');
+		if (ttsIndex !== -1) {
+			const username = extractUsername(message);
+				if (username) {
+					console.log('Username:', username);
+				}
+			const ttsMessage = message.substring(ttsIndex + 4).trim(); // Extract text after !tts
+			console.log('Text to speak:', ttsMessage);
+			
+			speak(username);
+			speak('sagt');
+			// Speak the text (you need to implement text-to-speech functionality)
+			speak(ttsMessage);
+		}
+		
+		// Display the original message in chat div
+		const chatDiv = document.getElementById('chat');
+		const p = document.createElement('p');
+		p.textContent = message;
+		chatDiv.appendChild(p);
+	};
+	
+	// Handle WebSocket close event
+	ws.addEventListener('close', function (event) {
+		console.log('Connection closed');
+	});
+	
+	// Function to speak text (you need to implement text-to-speech functionality)  
+	function speak(text) {
+		var textToSpeak = text;
+		var utterance = new SpeechSynthesisUtterance(textToSpeak);
+		utterance.rate = ttsspeed;
+		utterance.volume = ttsvolume;
+		window.speechSynthesis.speak(utterance);
+	}
+	function extractUsername(message) {
+		// Check if message starts with a ':'
+		if (message.startsWith(':')) {
+			// Split the message by spaces
+			const parts = message.split(' ');
+
+			// Get the second part, which should be the username
+			if (parts.length >= 2) {
+				// Remove ':' from the username
+				return parts[2].substring(1);
+			}
+		}
+		return null; // Return null if username extraction fails
+	}
+	window.addEventListener('DOMContentLoaded', function() {
+		var volumeSlider = document.getElementById('volumeSlider');
+		var speedSlider = document.getElementById('speedSlider');
+		
+		// Function to update slider width
+		function updateSliderWidth() {
+			var windowWidth = window.innerWidth; // Get window width
+			volumeSlider.style.width = windowWidth/2-100 + 'px'; // Set volume slider width to window width
+			speedSlider.style.width = windowWidth/2-100 + 'px'; // Set speed slider width to window width
+		}
+
+		// Call the function initially
+		updateSliderWidth();
+
+		// Call the function whenever the window is resized
+		window.addEventListener('resize', updateSliderWidth);
+	});
+    </script>
+</body>
+</html>

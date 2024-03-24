@@ -89,11 +89,13 @@
 				}
 			const ttsMessage = message.substring(ttsIndex + 4).trim(); // Extract text after !tts
 			console.log('Text to speak:', ttsMessage);
-			
-			speak(username);
-			speak('sagt');
-			// Speak the text (you need to implement text-to-speech functionality)
-			speak(ttsMessage);
+			// Längenbegrenzung der TTS en
+			if(ttsMessage.length<=160){
+				speak(username);
+				speak('sagt');
+				// Speak the text (you need to implement text-to-speech functionality)
+				speak(ttsMessage);
+			}
 		}
 		
 		// Display the original message in chat div
